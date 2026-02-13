@@ -33,11 +33,11 @@ bash ./download_2_llavanext.sh
 ```
 
 
-### LLaVA-Hound
+<!-- ### LLaVA-Hound
 ```bash
 cd ./Cambrian-s-3m+Llava-video+Llava-hound
 bash ./download_3_llavahound.sh
-```
+``` -->
 
 ### SynLinking
 ```bash
