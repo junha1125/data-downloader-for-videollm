@@ -10,13 +10,7 @@ if [ -z "$SCRIPT_RUNNING" ]; then
     exec script -f -q "$LOG_FILE" -c "$0 $*"
 fi
 
-if [ ! -d "LLaVA-Video-178K" ]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Downloading LLaVA-Video-178K..."
-    hf download lmms-lab/LLaVA-Video-178K --repo-type dataset --local-dir LLaVA-Video-178K
-else
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] LLaVA-Video-178K directory already exists"
-fi
-
+hf download lmms-lab/LLaVA-Video-178K --repo-type dataset --local-dir LLaVA-Video-178K
 cd LLaVA-Video-178K
 find . -name "*.tar.gz" -exec tar -zxf {} \;
 

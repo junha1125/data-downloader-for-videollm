@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration
-PATH_TO_LOCAL_DATASET="./"  # 🚨🚨🚨🚨🚨
+PATH_TO_LOCAL_DATASET="./"  # 🚨🚨🚨🚨🚨 나중에 멀티 쓰레드 코드로 바꿔서 돌리기 이거 너무 느림
 LOG_FILE="$PATH_TO_LOCAL_DATASET/download_extract_$(date +%Y%m%d_%H%M%S).log"
 
 # Start script recording if not already running under script

@@ -7,6 +7,21 @@ huggingface-cli download nyu-visionx/Cambrian-Alignment --repo-type dataset --lo
 cd Cambrian-10M
 python merge_tars.py
 python extract.py
+
+mv sbu558k/ llava_pretrain
+mv mnt/disks/storage/data/pretrain_data/2.5m_v2/allava/ ./
+ln -s llava_pretrain/ sbu558k
+
+python check_missing_images.py \
+  --json_path Cambrian-Alignment/jsons/alignment_2.5m.jsonl \
+  --root_folder Cambrian-Alignment \
+  --output missing_Cambrian-Alignment.json \
+  --output2 missing_image_place_Cambrian-Alignment.json
+python filter_json.py \
+  --origin_json Cambrian-Alignment/jsons/alignment_2.5m.jsonl \
+  --missing_json missing_Cambrian-Alignment.jsonl \
+  --delete_keys "llava_pretrain,sbu558k" \ # optional
+  --output Cambrian-Alignment/jsons/alignment_filtered.jsonl
 ```
 
 ### Cambrian-10M
