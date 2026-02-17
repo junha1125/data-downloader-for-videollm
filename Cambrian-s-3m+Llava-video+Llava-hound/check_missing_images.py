@@ -19,6 +19,12 @@ python check_missing_images.py \
   --output missing_Cambrian-10M.json \
   --output2 missing_image_place_Cambrian-10M.json
 
+# Cambrian-S
+python check_missing_images.py \
+  --json_path ./cambrian_s_3m.jsonl \
+  --root_folder ./ \
+  --output missing_Cambrian-S.jsonl \
+  --output2 missing_image_place_Cambrian-S.json
 """
 
 import argparse
@@ -69,16 +75,19 @@ def check_missing_images(json_path, root_folder, output_file='missing_images.jso
     
     # tqdm으로 진행 상황 표시
     for data in tqdm(datas, desc="이미지 확인 중", unit="개"):
-        if 'image' not in data:
+        if 'image' not in data and 'video' not in data:
             no_image_key_count += 1
             continue
         
-        img_path = data['image']
-        full_img_path = os.path.join(root_folder, img_path)
-        
-        # 이미지 파일 존재 여부 확인
-        if not os.path.exists(full_img_path):
-            # 전체 라인을 JSON 형식으로 저장
+        # 수정 코드
+        if 'image' in data:
+            media_path = data['image']
+        elif 'video' in data:
+            media_path = data['video']
+
+        full_media_path = os.path.join(root_folder, media_path)
+
+        if not os.path.exists(full_media_path):
             missing_lines.append(json.dumps(data, ensure_ascii=False))
     
     # 결과 저장
@@ -120,7 +129,7 @@ def check_missing_image_placeholder(json_path, output_file='missing_image_place.
         text_only = False
         
         # 'image' 키가 없으면 text_only
-        if 'image' not in data:
+        if 'image' not in data and 'video' not in data:
             text_only = True
         
         # text_only가 False인 경우만 체크 (이미지가 있는 경우)

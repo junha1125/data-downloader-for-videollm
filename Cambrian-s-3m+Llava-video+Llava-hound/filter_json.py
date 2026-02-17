@@ -64,6 +64,8 @@ def create_missing_image_set(missing_json_path):
     for data in missing_data:
         if 'image' in data:
             missing_images.add(data['image'])
+        elif 'video' in data:
+            missing_images.add(data['video'])
     
     print(f"누락된 이미지 {len(missing_images)}개를 로드했습니다.")
     return missing_images
@@ -96,22 +98,22 @@ def filter_json(origin_json_path, missing_json_path, delete_keys, output_file='f
     removed_by_delete_keys = 0
     
     for data in tqdm(origin_data, desc="데이터 필터링 중", unit="개"):
-        if 'image' not in data:
-            # 이미지가 없는 데이터는 그대로 유지
+        # 수정
+        if 'image' not in data and 'video' not in data:그대로 유지
             filtered_data.append(data)
             continue
         
-        img_path = data['image']
+        media_path = data.get('image') or data.get('video')
         
         # 1. 누락된 이미지인지 확인
-        if img_path in missing_images:
+        if media_path in missing_images:
             removed_by_missing += 1
             continue
-        
+
         # 2. delete_keys에 해당하는 경로인지 확인
         should_delete = False
         for delete_key in delete_key_list:
-            if delete_key in img_path:
+            if delete_key in media_path:
                 should_delete = True
                 removed_by_delete_keys += 1
                 break
