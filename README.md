@@ -136,10 +136,20 @@ python inspect_keys.py cambrian_s_3m_filtered.jsonl
 
 python filter_short_videos.py cambrian_s_3m_filtered.jsonl --output cambrian_s_3m_filtered_over5s.jsonl
 # 📝결과
+# Total lines : 3,052,454
+# Kept (>=5s)  : 2,813,074
+# Skipped (<5s): 227,828
+# Error        : 11,552 (maybe image only data)
 
 python filter_based_keys.py cambrian_s_3m_filtered_over5s.jsonl --output cambrian_s_3m_filtered_over5s_video.jsonl
 # datas with 'audio, <speech> in conversation, image' keys are removed.
 # 📝결과
+# total:              2,813,074
+# Kept:               2,810,976
+# Excluded (audio):   2,098
+# Excluded (speech):  0
+# Excluded (image):   0
+# Excluded total:     2,098
 
 python find_image_only_dirs.py # Just analye.
 python analyze_videos.py # Just analye. Time consumming (~12H)
