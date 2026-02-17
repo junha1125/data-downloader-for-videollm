@@ -131,8 +131,15 @@ python filter_json.py \
 # 최종 데이터: 3052454개
 # 제거된 총 데이터: 583084개
 
+python inspect_keys.py cambrian_s_3m_filtered.jsonl
+# datas with 'start_time, end_time, fps, start_frame, end_frame' keys are saved speprately in cambrian_s_3m_filtered_extra_keys.jsonl
+
 python filter_short_videos.py cambrian_s_3m_filtered.jsonl --output cambrian_s_3m_filtered_over5s.jsonl
-# 
+# 📝결과
+
+python filter_based_keys.py cambrian_s_3m_filtered_over5s.jsonl --output cambrian_s_3m_filtered_over5s_video.jsonl
+# datas with 'audio, <speech> in conversation, image' keys are removed.
+# 📝결과
 
 python find_image_only_dirs.py # Just analye.
 python analyze_videos.py # Just analye. Time consumming (~12H)
