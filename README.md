@@ -17,6 +17,7 @@ python check_missing_images.py \
   --root_folder Cambrian-Alignment \
   --output missing_Cambrian-Alignment.jsonl \
   --output2 missing_image_place_Cambrian-Alignment.jsonl
+# 📝결과
 # 전체 항목: 2513164개
 # 존재하는 이미지: 1878317개
 # 누락된 이미지: 634847개
@@ -26,6 +27,7 @@ python filter_json.py \
   --missing_json missing_Cambrian-Alignment.jsonl \
   --delete_keys "llava_pretrain,sbu558k" \
   --output Cambrian-Alignment/jsons/alignment_filtered.jsonl
+# 📝결과
 # 원본 데이터: 2513164개
 # 누락된 이미지로 제거: 634847개
 # 특정 경로로 제거: 558128개
@@ -50,47 +52,53 @@ python check_missing_images.py \
 
 
 ## Video
-```md
-**Cambrian-S-3M**
-star                 | Videos:   3032 | Res: 420x358 | Dur: 30.0s
-EgoTask              | Videos:    172 | Res: 640x480 | Dur: 182.5s
-vript_short          | Videos:   8776 | Res: 663x1149 | Dur: 4.8s
-vidln                | Videos:  41157 | Res: 759x530 | Dur: 9.5s
-favd                 | Videos:  10000 | Res: 1216x718 | Dur: 7.8s
-k710                 | Videos:  10000 | Res: 654x447 | Dur: 9.7s
-timeit               | Videos:  24807 | Res: 728x454 | Dur: 143.5s
-EGTEA                | Videos:     16 | Res: 640x480 | Dur: 677.0s
-activitynet          | Videos:  10009 | Res: 512x326 | Dur: 117.2s
-sharegpt4o           | Videos:   2111 | Res: 1687x953 | Dur: 23.3s
-EgoProceL            | Videos:     18 | Res: 1636x987 | Dur: 621.1s
-moviechat            | Videos:    795 | Res: 1354x750 | Dur: 446.7s
-textvr               | Videos:   7869 | Res: 392x224 | Dur: 18.1s
-ssv2                 | Videos:  40000 | Res: 393x240 | Dur: 3.8s
-clevrer              | Videos:  10000 | Res: 480x320 | Dur: 5.1s
-nturgbd              | Videos:  27354 | Res: 1920x1080 | Dur: 2.8s
-nextqa               | Videos:   3870 | Res: 597x437 | Dur: 44.9s
-Ego4d                | Videos:    124 | Res: 1876x1397 | Dur: 21.7s
-HoloAssist           | Videos:    121 | Res: 896x504 | Dur: 272.7s
-ADL                  | Videos:      8 | Res: 1280x960 | Dur: 1649.7s
-IndustReal           | Videos:     44 | Res: 1280x720 | Dur: 242.4s
-ChardesEgo           | Videos:    591 | Res: 905x781 | Dur: 30.7s
-Ego4d_clip           | Videos:    399 | Res: 1859x1062 | Dur: 22.8s
-guiworld             | Videos:  10556 | Res: 1357x931 | Dur: 17.1s
-lsmdc                | Videos:  24254 | Res: 1920x1080 | Dur: 4.1s
-vript_long           | Videos: 400040 | Res: 1267x718 | Dur: 11.2s
-webvid               | Videos:  99922 | Res: 595x334 | Dur: 18.0s
-EpicKitchens         | Videos:     36 | Res: 1902x1080 | Dur: 415.1s
-youcook2             | Videos:   7783 | Res: 1393x800 | Dur: 19.5s
-k400_targz           | Videos: 221966 | Res: 773x505 | Dur: 9.5s
 
-**LLaVA-Video**
-gpt4o_caption_prompt | Videos:      1 | Res: 406x720 | Dur: 15.0s
-NextQA               | Videos:   3868 | Res: 597x437 | Dur: 44.9s
-perception_test      | Videos:   1955 | Res: 1685x951 | Dur: 23.2s
-liwei_youtube_videos | Videos: 141889 | Res: 698x675 | Dur: 57.6s
-ActivityNet-QA       | Videos:   2353 | Res: 874x543 | Dur: 90.4s
-academic_source      | Videos:  30415 | Res: 865x563 | Dur: 48.4s
-```
+> **Cambrian-S-3M**
+
+| Dataset        | Videos | Resolution   | Duration (s) |
+|---------------|--------|--------------|--------------|
+| star          | 3032   | 420x358      | 30.0         |
+| EgoTask       | 172    | 640x480      | 182.5        |
+| vript_short   | 8776   | 663x1149     | 4.8          |
+| vidln         | 41157  | 759x530      | 9.5          |
+| favd          | 10000  | 1216x718     | 7.8          |
+| k710          | 10000  | 654x447      | 9.7          |
+| timeit        | 24807  | 728x454      | 143.5        |
+| EGTEA         | 16     | 640x480      | 677.0        |
+| activitynet   | 10009  | 512x326      | 117.2        |
+| sharegpt4o    | 2111   | 1687x953     | 23.3         |
+| EgoProceL     | 18     | 1636x987     | 621.1        |
+| moviechat     | 795    | 1354x750     | 446.7        |
+| textvr        | 7869   | 392x224      | 18.1         |
+| ssv2          | 40000  | 393x240      | 3.8          |
+| clevrer       | 10000  | 480x320      | 5.1          |
+| nturgbd       | 27354  | 1920x1080    | 2.8          |
+| nextqa        | 3870   | 597x437      | 44.9         |
+| Ego4d         | 124    | 1876x1397    | 21.7         |
+| HoloAssist    | 121    | 896x504      | 272.7        |
+| ADL           | 8      | 1280x960     | 1649.7       |
+| IndustReal    | 44     | 1280x720     | 242.4        |
+| ChardesEgo    | 591    | 905x781      | 30.7         |
+| Ego4d_clip    | 399    | 1859x1062    | 22.8         |
+| guiworld      | 10556  | 1357x931     | 17.1         |
+| lsmdc         | 24254  | 1920x1080    | 4.1          |
+| vript_long    | 400040 | 1267x718     | 11.2         |
+| webvid        | 99922  | 595x334      | 18.0         |
+| EpicKitchens  | 36     | 1902x1080    | 415.1        |
+| youcook2      | 7783   | 1393x800     | 19.5         |
+| k400_targz    | 221966 | 773x505      | 9.5          |
+
+> **LLaVA-Video**
+
+| Dataset                | Videos | Resolution   | Duration (s) |
+|------------------------|--------|--------------|--------------|
+| gpt4o_caption_prompt   | 1      | 406x720      | 15.0         |
+| NextQA                 | 3868   | 597x437      | 44.9         |
+| perception_test        | 1955   | 1685x951     | 23.2         |
+| liwei_youtube_videos   | 141889 | 698x675      | 57.6         |
+| ActivityNet-QA         | 2353   | 874x543      | 90.4         |
+| academic_source        | 30415  | 865x563      | 48.4         |
+
 
 ### Cambrian-S-3M
 ```bash
@@ -106,6 +114,7 @@ python check_missing_images.py \
   --root_folder ./ \
   --output missing_Cambrian-S.jsonl \
   --output2 missing_image_place_Cambrian-S.json
+# 📝결과
 # 전체 항목: 3635538개
 # 존재하는 이미지: 3370215개
 # 누락된 이미지: 265323개
@@ -115,7 +124,7 @@ python filter_json.py \
   --missing_json missing_Cambrian-S.jsonl \
   --delete_keys "tgif,tvqa,htstep_eventcount,htstep_eventunderstanding,htstep_eventrelationship,train_video_and_instruction" \
   --output cambrian_s_3m_filtered.jsonl
-#  === 필터링 결과 ===
+# 📝결과
 # 원본 데이터: 3635538개
 # 누락된 이미지로 제거: 265323개
 # 특정 경로로 제거: 317761개
@@ -154,6 +163,6 @@ python download_youtube_.py     # Vidoes are stored in folders
 
 **Annotaions**
 ```bash
-...precessing...
+...updating...
 ```
 
