@@ -151,6 +151,18 @@ python filter_based_keys.py cambrian_s_3m_filtered_over5s.jsonl --output cambria
 # Excluded (image):   0
 # Excluded total:     2,098
 
+python filter_curropted_process_video_durations-2.py \
+  -i cambrian_s_3m_filtered_over5s_video.jsonl \
+  -v /mnt/datasets-2/cambrian_s_3m \
+  -o cambrian_s_3m_filtered_over5s_video_w_duration.jsonl \
+  --duration-dir duration_json \
+  -t 16 \
+  --ffprobe-timeout 10 \
+  -b 30
+# decord 로 load 되지 않는 깨진 영상 제거
+# 각 영상당 duration 값을 json 에 추가한 새로운 json 파일 저장
+
+
 python find_image_only_dirs.py # Just analye.
 python analyze_videos.py # Just analye. Time consumming (~12H)
 # mp4, mkv, web,avi, mov formats
