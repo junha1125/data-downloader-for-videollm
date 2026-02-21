@@ -1,12 +1,13 @@
 import json
 import os
+import sys
 import argparse
 import subprocess
 import threading
 from concurrent.futures import ThreadPoolExecutor
-from decord import VideoReader
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 def get_video_duration(video_path, timeout=10):
     """Get video duration in seconds using ffprobe with timeout."""
@@ -26,17 +27,33 @@ def get_video_duration(video_path, timeout=10):
         print(f"[WARNING] ffprobe failed for {video_path}: {e}")
         return None
 
-def is_video_valid(video_path):
-    """Check if video is readable by decord (catches corrupted/partial files)."""
+
+def is_video_valid(video_path, timeout=60):
+    """Check if video is readable by decord, with a hard timeout.
+
+    Runs decord in a subprocess so it can be killed if it hangs.
+    Exit code 0 = valid, anything else = invalid.
+    """
     try:
-        vr = VideoReader(video_path)
-        _ = vr[0]  # try reading first frame
-        return True
+        result = subprocess.run(
+            [
+                sys.executable, "-c",
+                "import sys; from decord import VideoReader; "
+                "vr = VideoReader(sys.argv[1]); vr[0]; print('OK')",
+                video_path,
+            ],
+            capture_output=True, text=True, timeout=timeout,
+        )
+        return result.returncode == 0 and "OK" in result.stdout
+    except subprocess.TimeoutExpired:
+        print(f"[TIMEOUT] decord hung for {timeout}s: {video_path}")
+        return False
     except Exception as e:
         print(f"[WARNING] decord validation failed for {video_path}: {e}")
         return False
 
-def process_chunk(chunk, video_base_dir, thread_idx, ffprobe_timeout, output_dir):
+
+def process_chunk(chunk, video_base_dir, thread_idx, ffprobe_timeout, decord_timeout, output_dir):
     """Process a chunk and save results to a per-thread JSONL file immediately upon completion."""
     results = []
     durations = []
@@ -45,6 +62,13 @@ def process_chunk(chunk, video_base_dir, thread_idx, ffprobe_timeout, output_dir
         video_rel_path = data.get("video", "")
         video_path = os.path.join(video_base_dir, video_rel_path)
 
+        # EpicKitchens 폴더 영상은 무조건 스킵
+        if "EpicKitchens" in video_rel_path:
+            print(f"  [Thread {thread_idx}] [SKIP] EpicKitchens -> {video_rel_path}")
+            if (i + 1) % 100 == 0 or (i + 1) == total:
+                print(f"  [Thread {thread_idx}] {i + 1}/{total} ({(i + 1) / total * 100:.1f}%)")
+            continue
+
         # Step 1: get duration via ffprobe (fast, with timeout)
         duration = get_video_duration(video_path, timeout=ffprobe_timeout)
         if duration is None:
@@ -52,8 +76,8 @@ def process_chunk(chunk, video_base_dir, thread_idx, ffprobe_timeout, output_dir
                 print(f"  [Thread {thread_idx}] {i + 1}/{total} ({(i + 1) / total * 100:.1f}%)")
             continue
 
-        # Step 2: validate with decord (catches corrupted/partial files)
-        if not is_video_valid(video_path):
+        # Step 2: validate with decord (with timeout — won't hang forever)
+        if not is_video_valid(video_path, timeout=decord_timeout):
             if (i + 1) % 100 == 0 or (i + 1) == total:
                 print(f"  [Thread {thread_idx}] {i + 1}/{total} ({(i + 1) / total * 100:.1f}%)")
             continue
@@ -74,6 +98,7 @@ def process_chunk(chunk, video_base_dir, thread_idx, ffprobe_timeout, output_dir
 
     return results, durations
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Add video duration to JSONL and draw a histogram.")
     parser.add_argument("--input", "-i", type=str, required=True,
@@ -90,9 +115,12 @@ def parse_args():
                         help="Number of threads (default: 16)")
     parser.add_argument("--bin-size", "-b", type=int, default=30,
                         help="Histogram bin size in seconds (default: 30)")
-    parser.add_argument("--ffprobe-timeout", type=int, default=30,
-                        help="Timeout in seconds for each ffprobe call (default: 30)")
+    parser.add_argument("--ffprobe-timeout", type=int, default=10,
+                        help="Timeout in seconds for each ffprobe call (default: 10)")
+    parser.add_argument("--decord-timeout", type=int, default=10,
+                        help="Timeout in seconds for each decord validation call (default: 10)")
     return parser.parse_args()
+
 
 def main():
     args = parse_args()
@@ -105,6 +133,7 @@ def main():
     num_threads = args.num_threads
     bin_size = args.bin_size
     ffprobe_timeout = args.ffprobe_timeout
+    decord_timeout = args.decord_timeout
 
     # ---- Create duration_json directory ----
     os.makedirs(duration_dir, exist_ok=True)
@@ -126,12 +155,28 @@ def main():
     lock = threading.Lock()
 
     def worker(idx, chunk):
-        results, durations = process_chunk(chunk, video_base_dir, idx, ffprobe_timeout, duration_dir)
+        # Skip if this thread's output already exists
+        thread_output_path = os.path.join(duration_dir, f"thread_{idx:04d}.jsonl")
+        if os.path.exists(thread_output_path):
+            print(f"  [Thread {idx}] SKIP — {thread_output_path} already exists")
+            # Still load durations for histogram
+            with open(thread_output_path, "r") as f:
+                for line in f:
+                    if line.strip():
+                        d = json.loads(line)
+                        dur = d.get("video_duration")
+                        if dur is not None:
+                            with lock:
+                                all_durations.append(dur)
+            return
+
+        results, durations = process_chunk(chunk, video_base_dir, idx, ffprobe_timeout, decord_timeout, duration_dir)
         with lock:
             all_durations.extend(durations)
         print(f"  [Thread {idx}] Done — {len(results)} entries, {len(durations)} valid durations")
 
-    print(f"Processing videos with {num_threads} threads (ffprobe timeout={ffprobe_timeout}s) ...")
+    print(f"Processing videos with {num_threads} threads "
+          f"(ffprobe timeout={ffprobe_timeout}s, decord timeout={decord_timeout}s) ...")
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         futures = []
         for idx, chunk in enumerate(chunks):

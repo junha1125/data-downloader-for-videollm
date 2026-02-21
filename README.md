@@ -122,7 +122,7 @@ python check_missing_images.py \
 python filter_json.py \
   --origin_json cambrian_s_3m.jsonl \
   --missing_json missing_Cambrian-S.jsonl \
-  --delete_keys "tgif,tvqa,htstep_eventcount,htstep_eventunderstanding,htstep_eventrelationship,train_video_and_instruction" \
+  --delete_keys "tgif,tvqa,htstep_eventcount,htstep_eventunderstanding,htstep_eventrelationship,train_video_and_instruction,EpicKitchens" \
   --output cambrian_s_3m_filtered.jsonl
 # 📝결과
 # 원본 데이터: 3635538개
@@ -130,9 +130,7 @@ python filter_json.py \
 # 특정 경로로 제거: 317761개
 # 최종 데이터: 3052454개
 # 제거된 총 데이터: 583084개
-
-python inspect_keys.py cambrian_s_3m_filtered.jsonl
-# datas with 'start_time, end_time, fps, start_frame, end_frame' keys are saved speprately in cambrian_s_3m_filtered_extra_keys.jsonl
+# EpicKitchens 는 영상 길이 및 데이터 퀄리티에 문제 있음
 
 python filter_short_videos.py cambrian_s_3m_filtered.jsonl --output cambrian_s_3m_filtered_over5s.jsonl
 # 📝결과
@@ -151,22 +149,72 @@ python filter_based_keys.py cambrian_s_3m_filtered_over5s.jsonl --output cambria
 # Excluded (image):   0
 # Excluded total:     2,098
 
-python filter_curropted_process_video_durations-2.py \
+python filter_curropted_process_video_durations.py \
   -i cambrian_s_3m_filtered_over5s_video.jsonl \
-  -v /mnt/datasets-2/cambrian_s_3m \
-  -o cambrian_s_3m_filtered_over5s_video_w_duration.jsonl \
-  --duration-dir duration_json \
-  -t 16 \
-  --ffprobe-timeout 10 \
-  -b 30
+  -v /mnt/datasets-2/cambrian_s_3m/ \
+  --duration-dir /mnt/datasets-2/cambrian_s_3m/duration_json \
+  --decord-timeout 60
 # decord 로 load 되지 않는 깨진 영상 제거
 # 각 영상당 duration 값을 json 에 추가한 새로운 json 파일 저장
+# cambrian_s_3m_filtered_over5s_video_with_duration.jsonl saved.
 
+python filter_core_keys.py cambrian_s_3m_filtered_over5s_video_with_duration.jsonl
+# datas with 'start_time, end_time, fps, start_frame, end_frame' keys are deleted.
 
 python find_image_only_dirs.py # Just analye.
 python analyze_videos.py # Just analye. Time consumming (~12H)
 # mp4, mkv, web,avi, mov formats
 
+```
+
+
+```bash
+python print_video_duration_hist.py cambrian_s_3m_filtered_over5s_video_with_duration_core_keys.jsonl 2 10 100
+>> 인자 순서: `<jsonl파일> <pivot분> <short%> <long%>`
+>> cambrian_s_3m_..._under_2m_10p.jsonl   # 2분 미만, 10% 샘플
+>> cambrian_s_3m_..._over_2m_100p.jsonl   # 2분 이상, 100% 전체
+
+
+=======================================================
+  30초 단위 분포
+=======================================================
+  구간                             데이터 수         비율
+  -------------------------------------------
+  0s ~ 30s                   1,545,377     59.72%
+  30s ~ 60s                    416,537     16.10%
+  60s ~ 90s                    164,380      6.35%
+  90s ~ 120s                   166,776      6.45%
+  120s ~ 150s                  136,287      5.27%
+  150s ~ 180s                  128,402      4.96%
+  180s ~ 210s                   12,934      0.50%
+  210s ~ 240s                    8,133      0.31%
+  240s ~ 270s                    1,781      0.07%
+  270s ~ 300s                    1,794      0.07%
+
+=======================================================
+  5분 단위 분포
+=======================================================
+  구간                             데이터 수         비율
+  -------------------------------------------
+  0min ~ 5min                2,582,401     99.80%
+  5min ~ 10min                   5,042      0.19%
+  10min ~ 15min                    103      0.00%
+  15min ~ 20min                     40      0.00%
+  20min ~ 25min                      6      0.00%
+  25min ~ 30min                     19      0.00%
+  30min ~ 35min                      5      0.00%
+  35min ~ 40min                      1      0.00%
+  40min ~ 45min                      2      0.00%
+  45min ~ 50min                      3      0.00%
+  50min ~ 55min                      3      0.00%
+  55min ~ 60min                      1      0.00%
+  60min ~ 65min                      2      0.00%
+  65min ~ 70min                      2      0.00%
+  80min ~ 85min                      2      0.00%
+  115min ~ 120min                    1      0.00%
+  -------------------------------------------
+  합계                         2,587,633    100.00%
+=======================================================
 ```
 
 
