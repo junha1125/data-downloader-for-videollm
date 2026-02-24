@@ -1,16 +1,17 @@
 # data-downloader-for-videollm
 ## Image
 
-### Cambrian-10M
+### Cambrian-Alignment
 ```bash
 huggingface-cli download nyu-visionx/Cambrian-Alignment --repo-type dataset --local-dir Cambrian-Alignment
-cd Cambrian-10M
+cd Cambrian-Alignment
 python merge_tars.py
 python extract.py
 
 mv sbu558k/ llava_pretrain
+cd llava_pretrain && mkdir images
 mv mnt/disks/storage/data/pretrain_data/2.5m_v2/allava/ ./
-ln -s llava_pretrain/ sbu558k
+ln -s llava_pretrain/images sbu558k
 
 python check_missing_images.py \
   --json_path Cambrian-Alignment/jsons/alignment_2.5m.jsonl \
@@ -25,7 +26,7 @@ python check_missing_images.py \
 python filter_json.py \
   --origin_json Cambrian-Alignment/jsons/alignment_2.5m.jsonl \
   --missing_json missing_Cambrian-Alignment.jsonl \
-  --delete_keys "llava_pretrain,sbu558k" \
+  --delete_keys "sbu558k" \
   --output Cambrian-Alignment/jsons/alignment_filtered.jsonl
 # 📝결과
 # 원본 데이터: 2513164개
